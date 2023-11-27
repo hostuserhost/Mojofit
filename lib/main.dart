@@ -96,13 +96,8 @@ class CustomCard extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         onTap: () {
-          if (Platform.isIOS && !featureCompleted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: const Text(
-                    'This feature has not been implemented for iOS yet')));
-          } else
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => _viewPage));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => _viewPage));
         },
       ),
     );
