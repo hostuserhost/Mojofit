@@ -1,105 +1,37 @@
-import 'dart:io';
-
 import 'package:camera/camera.dart';
-import 'VisionDetectorViews/detector_views.dart';
 import 'package:flutter/material.dart';
+import 'package:mobx/mobx.dart';
+import 'package:mojofit/models/user_hive.dart';
+import 'package:mojofit/pages/home_screen.dart';
+import 'package:mojofit/states/globalState.dart';
+import 'package:mojofit/widgets/decorations.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mojofit/models/potion.dart';
 
-List<CameraDescription> cameras = [];
-
+List<CameraDescription> cameras = []; // Get cameras on phone
 Future<void> main() async {
+  // Start Initilize
   WidgetsFlutterBinding.ensureInitialized();
-
   cameras = await availableCameras();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Home(),
-    );
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserHiveAdapter());
+  Hive.registerAdapter(PotionTypeAdapter());
+  await Hive.openBox<UserHive>('main');
+  if (personal.get('main') == null) {
+    personal.put(
+        'main',
+        UserHive(
+            100,
+            0,
+            ObservableMap.of({
+              PotionType.minhealth: 0,
+              PotionType.midhealth: 0,
+              PotionType.highhealth: 0
+            })));
   }
-}
-
-class Home extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Google ML Kit Demo App'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  ExpansionTile(
-                    title: const Text("Vision"),
-                    children: [
-                      CustomCard(
-                        'Pose Detector Without Classifier',
-                        PoseDetectorView(
-                          useClassifier: false,
-                        ),
-                        featureCompleted: true,
-                      ),
-                      CustomCard(
-                        'Pose Detector With Classifier',
-                        PoseDetectorView(
-                          useClassifier: true,
-                        ),
-                        featureCompleted: true,
-                      ),
-                      CustomCard(
-                        'Pose Detector Activity',
-                        PoseDetectorView(
-                          useClassifier: true,
-                          isActivity: true,
-                        ),
-                        featureCompleted: true,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomCard extends StatelessWidget {
-  final String _label;
-  final Widget _viewPage;
-  final bool featureCompleted;
-
-  const CustomCard(this._label, this._viewPage,
-      {this.featureCompleted = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      margin: EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        tileColor: Theme.of(context).primaryColor,
-        title: Text(
-          _label,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => _viewPage));
-        },
-      ),
-    );
-  }
+  runApp(MaterialApp(
+    theme: mainTheme,
+    debugShowCheckedModeBanner: false,
+    home: SafeArea(child: HomeScreen()),
+  ));
 }

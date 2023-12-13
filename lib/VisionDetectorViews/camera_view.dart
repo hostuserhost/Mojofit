@@ -68,27 +68,11 @@ class _CameraViewState extends State<CameraView> {
         : Container();
   }
 
-  // Widget _liveFeedBody() {
-  //   if (_controller?.value.isInitialized == false) {
-  //     return Container();
-  //   }
-  //   return Container(
-  //     color: Colors.black,
-  //     child: Stack(
-  //       fit: StackFit.expand,
-  //       children: <Widget>[
-  //         CameraPreview(_controller!),
-  //         if (widget.customPaint != null) widget.customPaint!,
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Future _startLiveFeed() async {
     final camera = cameras[_cameraIndex];
     _controller = CameraController(
       camera,
-      ResolutionPreset.low,
+      ResolutionPreset.high,
       enableAudio: false,
     );
     _controller?.initialize().then((_) {
